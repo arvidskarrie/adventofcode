@@ -41,6 +41,7 @@ def part_1():
         boot_code[i] = DONE
         i += increment           
 
+# For part 2
 def part_1b(boot_code):
     accumulator_total = 0    
     i = 0
@@ -74,18 +75,21 @@ def part_2():
             boot_code.append(split_line)
 
     for i in range(len(boot_code)):
-        boot_code[i][0] = (boot_code[i][0] + 2) % 4
-        result = part_1b(deepcopy(boot_code))
+        if boot_code[i][0] == ACC:
+            continue
+        elif boot_code[i][0] == NOP:
+            op = JMP
+        else:
+            op = NOP
+
+        boot_code_evaluation = deepcopy(boot_code)
+        boot_code_evaluation[i][0] = op
+        result = part_1b(deepcopy(boot_code_evaluation))
 
         if result != None:
             return result
-        else:
-            boot_code[i][0] = (boot_code[i][0] + 2) % 4
     
     print('No solution found')
-
-   
-    
 
 #print(part_1()) # 1671
 print(part_2()) # 892
