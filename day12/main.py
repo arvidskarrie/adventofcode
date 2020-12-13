@@ -60,12 +60,23 @@ def part_1():
 
     return abs(movement[EAST]) + abs(movement[NORTH])
 
+def rotate_waypoint(waypoint, angle):
+    rotations = angle // 90
+    for _i in range(rotations):
+        new_east = waypoint[NORTH]
+        new_north = -waypoint[EAST]
+        waypoint[EAST] = new_east
+        waypoint[NORTH] = new_north
+    return waypoint
+
+
+
 def part_2():
     instruction_list = []
     movement = {
         EAST: 0,
         NORTH: 0}
-    waypoint = {
+    waypoint = { # relative to ship
         EAST: 10,
         NORTH: 1}
     
@@ -82,18 +93,7 @@ def part_2():
     for [direction, value] in instruction_list:
         if direction == RIGHT:
             # Rotate waypoint
-            if value == 90:
-                new_east = waypoint[NORTH]
-                new_north = -waypoint[EAST]
-            if value == 180:
-                new_east = -waypoint[EAST]
-                new_north = -waypoint[NORTH]
-            if value == 270:
-                new_east = -waypoint[NORTH]
-                new_north = waypoint[EAST]
-
-            waypoint[EAST] = new_east
-            waypoint[NORTH] = new_north            
+            waypoint = rotate_waypoint(waypoint, value)
             continue
 
         if direction == FORWARD:
@@ -119,4 +119,4 @@ def part_2():
 
 
 print(part_1()) # 2487
-print(part_2()) # 892cd 
+print(part_2()) # 29839 
