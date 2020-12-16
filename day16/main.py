@@ -38,31 +38,8 @@ def part_1():
 
     return error_rate
 
-def part_2(field):
-    ticket_list = []
-    fields = []
+def get_approved_tickets(accepted_dict, ticket_list):
     accepted_tickets = []
-    accepted_dict = {}
-
-    regex_terms = '(.*): (.*)-(.*) or (.*)-(.*)'
-
-    
-    #with open("input_test.txt") as file:
-    with open("input.txt") as file:
-        for line in file:
-            if line == "\n":
-                break
-
-            terms = re.findall(regex_terms, line)
-            terms = list(terms[0])
-            accepted_dict[terms[0]] = [[int(terms[1]), int(terms[2])], [int(terms[3]), int(terms[4])]]
-            fields.append(terms[0])
-
-        for line in file:
-            if line == "\n" or "ticket" in line:
-                continue
-            line = re.split(',', line.rstrip())
-            ticket_list.append(line)
 
     for ticket in ticket_list:
         approved_numbers = 0
@@ -80,32 +57,114 @@ def part_2(field):
                     break
                 
         if approved_numbers == len(ticket):
-            accepted_tickets.append(ticket) 
+            accepted_tickets.append(ticket)
+    return accepted_tickets
 
-    number_of_fields = len(fields)
-    #for field in fields:
-    #    if 'departure' in field:
+def get_field_numbers(accepted_tickets, ticket_field):
+    numbers = []
+    for ticket in accepted_tickets:
+        numbers.append(int(ticket[ticket_field]))
+    return numbers
 
-    print(accepted_tickets)
-    # Find what ticket_field corresponds to departure track
-    for ticket_field in range(number_of_fields):
-        # Check ticket field for every ticket
-        correct = True
-        for ticket in accepted_tickets:
-            [[minm1, maxm1], [minm2, maxm2]] = accepted_dict[field]
-            ticket_number = int(ticket[ticket_field])
-            if not ((minm1 <= ticket_number <= maxm1) or (minm2 <= ticket_number <= maxm2)):
-                correct = False
+def all_numbers_in_range(field_numbers, field_ranges):
+    [[minm1, maxm1], [minm2, maxm2]] = field_ranges
+    for number in field_numbers:
+        if (minm1 <= number <= maxm1) or (minm2 <= number <= maxm2):
+            continue
+        else:
+            return False
+    return True
+
+def part_2(field):
+    ticket_list = []
+    fields = []
+    accepted_dict = {}
+
+    regex_terms = '(.*): (.*)-(.*) or (.*)-(.*)'
+
+
+    #with open("input_test.txt") as file:
+    with open("input.txt") as file:
+        for line in file:
+            if line == "\n":
                 break
-        if correct:
-            return int(accepted_tickets[0][ticket_field])
 
+            terms = re.findall(regex_terms, line)
+            terms = list(terms[0])
+            accepted_dict[terms[0]] = [[int(terms[1]), int(terms[2])], [int(terms[3]), int(terms[4])]]
+            fields.append(terms[0])
+
+        for line in file:
+            if line == "\n" or "ticket" in line:
+                continue
+            line = re.split(',', line.rstrip())
+            ticket_list.append(line)
+
+    # This part was added after to find final answer
+    ans = 1
+    for i in [3, 5, 16, 11, 4, 17]:
+        ans *= int(ticket_list[0][i])
+    print(ans)
+
+    accepted_tickets = get_approved_tickets(accepted_dict, ticket_list)
+    number_of_fields = len(fields)
+
+    for i in range(number_of_fields):
+        field = fields[i]
+        # Find what ticket_field corresponds to departure track
+        for ticket_field in range(number_of_fields):
+            # Check ticket field for every ticket
+            field_numbers = get_field_numbers(accepted_tickets, ticket_field)
+
+            if all_numbers_in_range(field_numbers, accepted_dict[field]):
+                print((i), ticket_field)
+                #print(field, ticket_field, int(accepted_tickets[0][ticket_field]))
+
+
+
+def part_2_b():
+    dict_fields = {}
+    with open("input_test_2.txt") as file:
+        for line in file:
+            line = re.split(' ', line.rstrip())
+            if line[0] in dict_fields.keys():
+                old_line = dict_fields[line[0]]
+                old_line.append(int(line[1]))
+                dict_fields[line[0]] = old_line
+            else:
+                dict_fields[line[0]] = [int(line[1])]
+    for key in dict_fields.keys():
+        print(key, dict_fields[key])
+
+
+
+#print(part_1()) # 517
+dep_list = [
+    'departure location',
+    'departure station',
+    'departure platform',
+    'departure track',
+    'departure date',
+    'departure time',
+    'arrival location',
+    'arrival station',
+    'arrival platform',
+    'arrival track',
+    'class',
+    'duration',
+    'price',
+    'route',
+    'row',
+    'seat',
+    'train',
+    'type',
+    'wagon',
+    'zone']
     
-
-print(part_1()) # 517
-answer = 1
-dep_list = ['departure location', 'departure station', 'departure platform', 'departure track', 'departure date', 'departure time']
-dep_list = ['departure location', 'departure station', 'departure platform', 'departure track', 'departure date', 'departure time']
-for field in dep_list:
-    answer *= part_2(field)
-print(answer)
+    
+    
+    #dep_list = ['departure location']
+#for field in dep_list:
+#    part_2(field)
+part_2('a')
+#part_2_b()
