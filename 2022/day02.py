@@ -8,83 +8,58 @@ import aocd
 USE_TEST_DATA = 0
 TEST_DATA = 'A Y\nB X\nC Z'
 
+if USE_TEST_DATA:
+    input_list = TEST_DATA.splitlines()
+else:
+    input_list = aocd.get_data().splitlines()
+
 YOU_ROCK = 1
 YOU_PAPER = 2
 YOU_SCISSOR = 3
-ME_ROCK = 4
-ME_PAPER = 5
-ME_SCISSOR = 6
-ME_LOSE = 4
-ME_TIE = 5
-ME_WIN = 6
+ME_ROCK = 1 # ME_TIE
+ME_PAPER = 2 # ME_WIN
+ME_SCISSOR = 3 # ME_LOSE
 
-# choice_dict = {
-#     'A': YOU_ROCK,
-#     'B': YOU_PAPER,
-#     'C': YOU_SCISSOR,
-#     'X': ME_ROCK,
-#     'Y': ME_PAPER,
-#     'Z': ME_SCISSOR,
+class my_int(int):
+    def __mod__(self, n):
+        return (self - 1) % n + 1
 
 choice_dict = {
     'A': YOU_ROCK,
     'B': YOU_PAPER,
     'C': YOU_SCISSOR,
-    'X': ME_LOSE,
-    'Y': ME_TIE,
-    'Z': ME_WIN,
+    'X': ME_ROCK,
+    'Y': ME_PAPER,
+    'Z': ME_SCISSOR,
 }
 
-def calc_points(round):
-    result = (round[1] - round[0]) % 3
-    own_extra_score = (round[1] - 1) % 3 + 1
-    if result == 0:
-        return 3 + own_extra_score
-    if result == 1:
-        return 6 + own_extra_score
-    if result == 2:
-        return own_extra_score
-    breakpoint
+def calc_win_points(part, they, me):
+    def internal_calc_win_points():
+        return (me - they + 1) % 3 # normal mod
 
-def calc_points2(round):
-    result = (round[1] - 4) * 3
-    own_extra_score = (round[1] - 2 * round[0]) % 3 + 1
-    return result + own_extra_score
+    if part == 1:
+        return internal_calc_win_points() * 3
+    if part == 2:
+        return (me % 3) * 3
 
-# 14 0 0
-# 15 1 1 (diff - round[0]) % 3 +1
-# 16 2 2
-# 24 2 1
-# 25 0 2 (diff - round[0]) % 3 +1
-# 26 1 0
-# 34 1 2
-# 35 2 0 (diff - round[0]) % 3 +1
-# 36 0 1
+def calc_choice_points(part, they, me):
+    if part == 1:
+        return my_int(me) % 3
+    if part == 2:
+        # return my_int(they + me + 2) % 3
+        return my_int(me - 2 * they + 2) % 3
+
+def calc_points(part, round):
+    win_points = calc_win_points(part, round[0], round[1])
+    choice_points = calc_choice_points(part, round[0], round[1])
+
+    return win_points + choice_points
+
+def play(part):
+    round_list = list(map(lambda line: [choice_dict[line[0]], choice_dict[line[2]] - int(part == 2)], input_list))
+
+    return sum(calc_points(part, round) for round in round_list)
 
 
-def part_1():
-    if USE_TEST_DATA:
-        input_list = TEST_DATA.splitlines()
-    else:
-        input_list = aocd.get_data().splitlines()
-    round_list = list(map(lambda line: [choice_dict[line[0]], choice_dict[line[2]]], input_list))
-
-    sum_points = 0
-    for round in round_list:
-        sum_points += calc_points(round)
-    print(sum_points)
-
-def part_2():
-    if USE_TEST_DATA:
-        input_list = TEST_DATA.splitlines()
-    else:
-        input_list = aocd.get_data().splitlines()
-    round_list = list(map(lambda line: [choice_dict[line[0]], choice_dict[line[2]]], input_list))
-
-    sum_points = 0
-    for round in round_list:
-        sum_points += calc_points2(round)
-    print(sum_points)
-
-# part_1() 10718
-part_2() #10718
+print(play(1) == 10718, play(1))
+print(play(2) == 14652, play(2))
