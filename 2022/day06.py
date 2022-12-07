@@ -4,8 +4,8 @@ os.environ["AOC_SESSION"] = "53616c7465645f5feb5f98622da494e1f359f67b2973c8f6a54
 import aocd
 
 def part_1(msg_length):
-    for idx in range (msg_length, len(aocd.get_data())):
-        letter_list = str(aocd.get_data()[idx-msg_length:idx])
+    for idx in range (msg_length, len(aocd.get_data(day=6))):
+        letter_list = str(aocd.get_data(day=6)[idx-msg_length:idx])
         if len(set(letter_list)) == len(letter_list):
             return idx
 

@@ -40,105 +40,69 @@ else:
     NO_OF_STACKS = 9
 
 
-l = 0
 global_sum = 0
-MINIMUM_TO_DELETE = 0
+g_minimum_to_delete = 0
 smallest_so_far = 0
-def map_one_dir():
-    global l
+
+def map_one_dir(l_idx):
     local_directory = {}
     while True:     
-        if l >= len(input_list):
-            return local_directory
+        if l_idx >= len(input_list):
+            return (local_directory, l_idx)
 
-        line = input_list[l]
+        line = input_list[l_idx]
         if line == '$ cd ..':
-            l += 1
-            return local_directory
+            l_idx += 1
+            return (local_directory, l_idx)
         elif '$ cd' in line:
             new_dir_name = line[5:]
-            l += 1
-            local_directory[new_dir_name] = map_one_dir()
+            l_idx += 1
+            (local_directory[new_dir_name], l_idx) = map_one_dir(l_idx)
             continue
         elif line == '$ ls':
             while True:
-                l += 1
-                if l >= len(input_list):
-                    return local_directory
-                line = input_list[l]
+                l_idx += 1
+                if l_idx >= len(input_list):
+                    return (local_directory, l_idx)
+                line = input_list[l_idx]
                 if '$' in line:
                     break
                 line = line.split(' ')
                 local_directory[line[1]] = line [0]
             continue
         
-def get_dir_sum(dir):
+def get_dir_sum(dir, part):
     global global_sum
-    dir_sum = 0
-    for k, v in dir.items():
-        if type(v) == dict:
-            v = get_dir_sum(v)
-            if v <= 100000:
-                global_sum += v
-        dir_sum += int(v)
-    return dir_sum
-
-def get_dir_sum2(dir):
     global smallest_so_far
     dir_sum = 0
     for k, v in dir.items():
         if type(v) == dict:
-            v = get_dir_sum2(v)
-            if v >= MINIMUM_TO_DELETE and v <= smallest_so_far:
-            # if v >= MINIMUM_TO_DELETE:
-                print('Larger than min', k, v)
+            v = get_dir_sum(v, part)
+            if v <= 100000 and part == 1:
+                global_sum += v
+            if v >= g_minimum_to_delete and v <= smallest_so_far and part == 2:
                 smallest_so_far = v
         dir_sum += int(v)
     return dir_sum
 
 def part_1(part):
-    global l
     global global_sum
-    l = 0
     global_sum = 0
-    global MINIMUM_TO_DELETE
+    global g_minimum_to_delete
+    g_minimum_to_delete = 7e7
     global smallest_so_far
+    smallest_so_far = 7e7
 
-    TOTAL_DISK_SPACE = 7e7
-    DISK_SPACE_NEEDED = 3e7
-    MINIMUM_TO_DELETE = TOTAL_DISK_SPACE
-    
-    directory = map_one_dir()
+    (directory, _) = map_one_dir(l_idx=0)
 
-    dir_sum = get_dir_sum(directory)
-    memory_balance = TOTAL_DISK_SPACE - dir_sum - DISK_SPACE_NEEDED
-    MINIMUM_TO_DELETE = -memory_balance
-    smallest_so_far = TOTAL_DISK_SPACE
+    dir_sum = get_dir_sum(directory, part)
 
-    return global_sum
+    if part == 1:
+        return global_sum
+    elif part == 2:
+        g_minimum_to_delete = dir_sum + 3e7 - 7e7
+        get_dir_sum(directory, 2)
+        return smallest_so_far
 
-def part_2(part):
-    global l
-    global global_sum
-    l = 0
-    global_sum = 0
-    global MINIMUM_TO_DELETE
-    TOTAL_DISK_SPACE = 7e7
-    DISK_SPACE_NEEDED = 3e7
-    MINIMUM_TO_DELETE = TOTAL_DISK_SPACE
-    
-    directory = map_one_dir()
-
-    dir_sum = get_dir_sum2(directory)
-
-    memory_balance = TOTAL_DISK_SPACE - dir_sum - DISK_SPACE_NEEDED
-    MINIMUM_TO_DELETE = -memory_balance
-    print(dir_sum, MINIMUM_TO_DELETE)
-    dir_sum = get_dir_sum2(directory)
-
-    return 'done'
-    # return MINIMUM_TO_DELETE
-
-print(part_1(1))
-print(part_1(1))
-print(part_2(2))
+print(part_1(1) == 1427048)
+print(part_1(2) == 2940614)
