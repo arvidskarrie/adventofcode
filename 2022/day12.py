@@ -27,7 +27,7 @@ class Node:
 
 class Dijkstra:
 
-    def __init__(self, input):
+    def __init__(self, input, part):
         self.no_lines = len(input)
         self.no_columns = len(input[0])
         self.nodes = []
@@ -37,11 +37,10 @@ class Dijkstra:
         for i in range(self.no_lines):
             node_line = []
             for j in range(self.no_columns):
-                if input[i][j] == ord('S'):
+                if input[i][j] == ord('S') or (input[i][j] == ord('a') and part == 2):
                     # Set start node
                     node = Node(i, j, ord('a'))
                     node.distance = 0
-                    self.start_node = node
                 elif input[i][j] == ord('E'):
                     node = Node(i, j, ord('z'))
                     self.end_node = node
@@ -79,9 +78,6 @@ class Dijkstra:
             col = c_node.col
             # print('new lowest', line, col, lowest_distance)
 
-
-            if line == 11 and col == 118:
-                self.print_distances()
             neighbour_list = [(line, col+1), (line, col-1), (line+1, col), (line-1, col)]
 
             # Go through all its neighbours
@@ -111,7 +107,7 @@ class Dijkstra:
 def part_1(part):
     ord_input = [[ord(s) for s in xs] for xs in input_list]
     
-    dijkstra = Dijkstra(ord_input)
+    dijkstra = Dijkstra(ord_input, part)
 
     return dijkstra.run()
 
@@ -119,3 +115,4 @@ def part_1(part):
 
 
 print(part_1(1))
+print(part_1(2))
