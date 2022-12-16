@@ -3,11 +3,12 @@ import os
 os.environ["AOC_SESSION"] = "53616c7465645f5feb5f98622da494e1f359f67b2973c8f6a54ed362910e50e251d3f40a7189ffd45624f53a2c2e408b0039c07d21c2423c1ebce73b8d6b4bce"
 
 from itertools import combinations, permutations
+from functools import lru_cache
 import aocd
 import re
 
 
-USE_TEST_DATA = 1
+USE_TEST_DATA = 0
 TEST_DATA = 'Valve AA has flow rate=0; tunnels lead to valves DD, II, BB\nValve BB has flow rate=13; tunnels lead to valves CC, AA\nValve CC has flow rate=2; tunnels lead to valves DD, BB\nValve DD has flow rate=20; tunnels lead to valves CC, AA, EE\nValve EE has flow rate=3; tunnels lead to valves FF, DD\nValve FF has flow rate=0; tunnels lead to valves EE, GG\nValve GG has flow rate=0; tunnels lead to valves FF, HH\nValve HH has flow rate=22; tunnel leads to valve GG\nValve II has flow rate=0; tunnels lead to valves AA, JJ\nValve JJ has flow rate=21; tunnel leads to valve II'
 START_VALVE_NAME = 'AA'
 if USE_TEST_DATA:
@@ -27,30 +28,6 @@ class Valve:
             self.conn_map[conn] = 1
         self.open = False
 
-def evaluate(combo, valves):
-    pressure_released = 0
-    last_valve = valves[START_VALVE_NAME]
-    countdown = 30
-    for part in combo:
-        # Travel from last part
-        countdown -= last_valve.conn_map[part]
-
-        # Take one minute opening
-        countdown -= 1
-        valve = valves[part]
-        valve.open = True
-
-        # See if time has run out
-        if countdown <= 0:
-            return pressure_released
-
-        # Add total pressure released
-        pressure_released += valve.flow * countdown
-        last_valve = valve
-
-    # If path is done, return 
-    return pressure_released
-
 def part_1(part):
     valves = {}
     for line in input_list:
@@ -60,9 +37,6 @@ def part_1(part):
         valve = Valve(terms)
         valves[valve.name] = valve
     
-    print(len(valves))
-
-
     # Remove valves with no flow
     valves_to_be_deleted = []
     for name, valve in valves.items():
@@ -81,6 +55,7 @@ def part_1(part):
             if name in second_valve.conn_map:
                 del second_valve.conn_map[name]
             dist = comb[0][1] + comb[1][1]
+
             # Add new tunnel on the first and second valve
             if (not second_valve.name in first_valve.conn_map) or (first_valve.conn_map[second_valve.name] > dist):
                 first_valve.conn_map[second_valve.name] = dist
@@ -93,36 +68,43 @@ def part_1(part):
     for valve in valves_to_be_deleted:
         del valves[valve.name]
 
-    # Create paths betseen all still existing valves
-    for name, valve in valves.items():
-        conn_combs = combinations(valve.conn_map.items(), 2)
-        for comb in conn_combs:
-            first_valve = valves[comb[0][0]]
-            second_valve = valves[comb[1][0]]
-            dist = comb[0][1] + comb[1][1]
-            # Add new tunnel on the first and second valve
-            if (not second_valve.name in first_valve.conn_map) or (first_valve.conn_map[second_valve.name] > dist):
-                first_valve.conn_map[second_valve.name] = dist
-                second_valve.conn_map[first_valve.name] = dist
+    flow = {}
+    neighbours = {}
     for valve in valves.values():
-        assert len(valve.conn_map) == len(valves) - 1
+        flow[valve.name] = valve.flow
+        neighbours[valve.name] = valve.conn_map
 
+    # curr_pos = string with name
+    # open_sorted_tuple = tuple with all already opened strings
+    # time_left = int with time left
+    # flow = dict with all flow values
+    # neighbours = dict matching neighbours names
+    @lru_cache(maxsize=None)
+    def calc_maxflow(curr_pos, open_sorted_tuple, time_left):
+        best = 0
+        if time_left <= 0:
+            return best
+        
+        # If closed, we could open the valve
+        if not curr_pos in open_sorted_tuple:
+            # Calculate with new tuple and one minute less
+            unsorted_tuple = open_sorted_tuple + (curr_pos,)
+            new_open_set = tuple(sorted(unsorted_tuple))
+            gain = flow[curr_pos] * (time_left - 1) # new gain from valve
+            best = calc_maxflow(curr_pos, new_open_set, time_left - 1) + gain
+        
+        # Iterate over neighbours and choose the best result
+        for n_pos, n_time in neighbours[curr_pos].items():
+            best = max(best, calc_maxflow(n_pos, open_sorted_tuple, time_left - n_time))
 
-    # generate all alternatives
-    pop_AA = valves.pop(START_VALVE_NAME)
-    all_combinations = list(permutations(valves.keys(), len(valves)))
-    # all_combinations = list(permutations(valves.keys(), 8))
-    valves[pop_AA.name] = pop_AA
+        return best
 
-    # return len(all_combinations)
+    return calc_maxflow(START_VALVE_NAME, (START_VALVE_NAME,), 30)
+        
 
-    # Iterate through all alternatives
-    max_value = 0
-    for combo in all_combinations:
-        val = evaluate(combo, valves)
-        max_value = max(max_value, val)
+            
 
-    return max_value
+        # From current pos, we can go to 
 
 
 
