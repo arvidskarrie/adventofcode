@@ -77,13 +77,17 @@ def part_1(part):
     # curr_pos = string with name
     # open_sorted_tuple = tuple with all already opened strings
     # time_left = int with time left
+    
     # flow = dict with all flow values
     # neighbours = dict matching neighbours names
     @lru_cache(maxsize=None)
-    def calc_maxflow(curr_pos, open_sorted_tuple, time_left):
+    def calc_maxflow(curr_pos, open_sorted_tuple, time_left, elephant_active):
         best = 0
         if time_left <= 0:
-            return best
+            if elephant_active:
+                return best
+            else:
+                return calc_maxflow(START_VALVE_NAME, open_sorted_tuple, 26, True)
         
         # If closed, we could open the valve
         if not curr_pos in open_sorted_tuple:
@@ -91,15 +95,20 @@ def part_1(part):
             unsorted_tuple = open_sorted_tuple + (curr_pos,)
             new_open_set = tuple(sorted(unsorted_tuple))
             gain = flow[curr_pos] * (time_left - 1) # new gain from valve
-            best = calc_maxflow(curr_pos, new_open_set, time_left - 1) + gain
+            best = calc_maxflow(curr_pos, new_open_set, time_left - 1, elephant_active) + gain
         
         # Iterate over neighbours and choose the best result
         for n_pos, n_time in neighbours[curr_pos].items():
-            best = max(best, calc_maxflow(n_pos, open_sorted_tuple, time_left - n_time))
+            best = max(best, calc_maxflow(n_pos, open_sorted_tuple, time_left - n_time, elephant_active))
+
+        # Or do nothing
+        # If elephant is not active, it will become active
+        # Otherwise, we will return nothing
+        best = max(best, calc_maxflow(n_pos, open_sorted_tuple, 0, elephant_active))
 
         return best
 
-    return calc_maxflow(START_VALVE_NAME, (START_VALVE_NAME,), 30)
+    return calc_maxflow(START_VALVE_NAME, (START_VALVE_NAME,), 26 if part == 2 else 30, part == 1)
         
 
             
@@ -108,4 +117,5 @@ def part_1(part):
 
 
 
-print(part_1(1)) # 1651
+# print(part_1(1)) # 1651 if test, else 1595
+print(part_1(2)) # Should be 1707
