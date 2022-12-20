@@ -48,15 +48,19 @@ def mine(rob, inv):
         new_inv_tuple = new_inv_tuple + (inv[idx] + rob[idx],)
     return new_inv_tuple
 
-def can_we_get_enough_obsidian(obs_robots, obs_needed, time_left):
+def can_we_get_enough_obsidian(obs_robots, obs_needed, obs_currently, time_left):
     # The current robots will produce obs_robots * (time_left - 2) obsidian until round 2
     time_until_2 = time_left - 2
-    obs_needed -= obs_robots * time_until_2
-    if time_left <= 3:
-        return obs_needed <= 0
-    return True
-    return obs_needed <= (time_until_2 * (time_until_2 + 1) / 2)
-    This is not working
+    
+    # Our guaranteed amount is current + future
+    future_obs_amount = obs_currently + obs_robots * time_until_2
+
+    # No point in creating any new obs_robots
+    if time_until_2 <= 1:
+        return obs_needed <= future_obs_amount
+
+    # Optimally, we can build robots and harvest (time_until_2 * (time_until_2 - 1) / 2) obsidian
+    return obs_needed <= future_obs_amount + (time_until_2 * (time_until_2 - 1) / 2)
     
 
 def part_1(part):
@@ -79,9 +83,13 @@ def part_1(part):
             return best
         if (time_left < 5 and robots[0] == 0): # tested to remove
             return best
-            # We need at least robot_costs[3][2] when time_left = 2
-        # if not can_we_get_enough_obsidian(robots[2], robot_costs[3][2], time_left):
-        #     return best
+
+        # We need at least robot_costs[3][2] when time_left = 2
+        obsidian_needed = robot_costs[3][2]
+        no_of_obsidian_robots = robots[2]
+        current_obsidian_amount = inventory[2]
+        if not can_we_get_enough_obsidian(robots[2], robot_costs[3][2], inventory[2], time_left):
+            return best
         
         
         # For every robot we can build, build it and evaluate
@@ -119,8 +127,7 @@ def part_1(part):
                 best = max(best, calc_max_geode(new_robots, new_inv, time_left - 1) + gain)
 
         # If we can build all types of robots, we must build one:
-        if True:
-        # if not can_all_robots_be_built(inventory, robot_costs):
+        if not can_all_robots_be_built(inventory, robot_costs):
             # Evaluate if we do not build
             new_inv = mine(robots, inventory)
             best = max(best, calc_max_geode(robots, new_inv, time_left - 1))
@@ -129,6 +136,7 @@ def part_1(part):
         return best
 
     total_value = 0
+    total_cycles = 0
     for bp in blueprints:
         calc_max_geode.cache_clear()
         inventory = (0, 0, 0)
@@ -145,8 +153,9 @@ def part_1(part):
 
         print(bp.id, best_value * bp.id)
         total_value += best_value * bp.id
+        total_cycles += calc_max_geode.cache_info().currsize
         print(calc_max_geode.cache_info())
-
+    print('total cycles', total_cycles)
     return total_value
 
 print(part_1(1))
