@@ -14,7 +14,7 @@ START_VALVE_NAME = 'AA'
 if USE_TEST_DATA:
     input_list = TEST_DATA.splitlines()
 else:
-    input_list = aocd.get_data().splitlines()
+    input_list = aocd.get_data(day=16).splitlines()
 
 
 input_regex = r'Valve (.*) has flow rate=(.*); tunnel(?:s)? lead(?:s)? to valve(?:s)? (.*)'
@@ -109,13 +109,6 @@ def part_1(part):
         return best
 
     return calc_maxflow(START_VALVE_NAME, (START_VALVE_NAME,), 26 if part == 2 else 30, part == 1)
-        
-
-            
-
-        # From current pos, we can go to 
-
-
 
 # print(part_1(1)) # 1651 if test, else 1595
 print(part_1(2)) # Should be 1707
