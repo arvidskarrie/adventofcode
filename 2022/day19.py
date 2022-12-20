@@ -77,11 +77,11 @@ def part_1(part):
         best = 0
         if time_left <= 1:
             return best
-        if (time_left < 4 and robots[2] == 0):  # tested to remove
+        if (time_left < 4 and robots[2] == 0):
             return best
-        if (time_left < 5 and robots[1] == 0): # tested to remove
+        if (time_left < 5 and robots[1] == 0):
             return best
-        if (time_left < 5 and robots[0] == 0): # tested to remove
+        if (time_left < 5 and robots[0] == 0):
             return best
 
         # We need at least robot_costs[3][2] when time_left = 2
@@ -137,11 +137,13 @@ def part_1(part):
 
     total_value = 0
     total_cycles = 0
+    if part == 2:
+        blueprints = blueprints[0:3]
     for bp in blueprints:
         calc_max_geode.cache_clear()
         inventory = (0, 0, 0)
         robots = (1, 0, 0)
-        time_left = 24
+        time_left = 24 if part == 1 else 32
         robot_costs = bp.robot_costs
         max_robots_needed = {0: 0, 1: 0, 2: 0}
         for robot in robot_costs:
@@ -151,11 +153,11 @@ def part_1(part):
         best_value = calc_max_geode(robots, inventory, time_left)
 
 
-        print(bp.id, best_value * bp.id)
-        total_value += best_value * bp.id
+        print(bp.id, best_value * (bp.id if part == 1 else 1))
+        total_value += best_value * (bp.id if part == 1 else 1)
         total_cycles += calc_max_geode.cache_info().currsize
         print(calc_max_geode.cache_info())
     print('total cycles', total_cycles)
     return total_value
 
-print(part_1(1))
+print(part_1(2)) # 1725
