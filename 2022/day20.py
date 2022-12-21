@@ -10,8 +10,8 @@ import numpy as np
 from collections import deque
 
 
-USE_TEST_DATA = 1
-TEST_DATA = '15\n2\n-10\n3\n-2\n0\n4'
+USE_TEST_DATA = 0
+TEST_DATA = '1\n2\n-10\n3\n-2\n0\n4'
 if USE_TEST_DATA:
     input_list = TEST_DATA.splitlines()
 else:
@@ -38,9 +38,30 @@ def part_1(part):
         ord_list.append((order, integer))
 
     for order in range(INPUT_LEN):
+
+        # slow working solution:
+        ord_list_old = ord_list.copy()
+        idx = get_idx(order, ord_list_old, 0)
+        value = ord_list_old[idx][1]
+        if value == 0:
+            continue
+        dir = 1 if value > 0 else -1
+
+        # Make one move at the time
+        for _move in range(abs(value)):
+            if dir == 1 and idx == INPUT_LEN - 1:
+                ord_list_old = [ord_list_old[-1]] + ord_list_old[:-1]
+                idx = 0
+            if dir == -1 and idx == 0:
+                ord_list_old = ord_list_old[1:] + [ord_list_old[0]]
+                idx = INPUT_LEN - 1
+            ord_list_old[idx], ord_list_old[idx + dir] = ord_list_old[idx + dir], ord_list_old[idx]
+            idx += dir
+        
+        #Fast not working
         # Find index for order
         idx = get_idx(order, ord_list, 0)
-        value = custom_mod(ord_list[idx][1], INPUT_LEN)
+        value = custom_mod(ord_list[idx][1], INPUT_LEN-1)
         if value == 0:
             continue
         dir = 1 if value > 0 else -1
@@ -60,7 +81,26 @@ def part_1(part):
         end_ord_list = ord_list[abs(value)+1:]
         ord_list = list(start_ord_list) + end_ord_list
 
-        # print(value, list(val[1] for val in ord_list))
+        # Rotate to match
+        zero_spot_value = ord_list_old[0][0]
+        idx = get_idx(zero_spot_value, ord_list, 0)
+        ord_list = deque(ord_list)
+        ord_list.rotate(-idx)
+        ord_list = list(ord_list)
+
+        # for idx in range(len(ord_list)):
+        #     if ord_list[idx] != ord_list_old[idx]:
+        #         val1 = ord_list[idx]
+        #         val2 = ord_list_old[idx]
+        #         print(val1, val2)
+        if ord_list != ord_list_old:
+            for idx in range(len(ord_list)):
+                if ord_list[idx] != ord_list_old[idx]:
+                    val1 = ord_list[idx]
+                    val2 = ord_list_old[idx]
+                    print(idx, val1, val2)
+
+
         
 
 
