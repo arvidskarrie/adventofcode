@@ -85,13 +85,9 @@ def part_1(part):
             return best
 
         # We need at least robot_costs[3][2] when time_left = 2
-        obsidian_needed = robot_costs[3][2]
-        no_of_obsidian_robots = robots[2]
-        current_obsidian_amount = inventory[2]
         if not can_we_get_enough_obsidian(robots[2], robot_costs[3][2], inventory[2], time_left):
             return best
-        
-        
+
         # For every robot we can build, build it and evaluate
         for robot_type in range(4):
             if (time_left < 4 and robot_type == 2):
