@@ -22,59 +22,102 @@ UNKNOWN = 'Unknown'
 input_regex_full = r'(.*): (.*) (.*) (.*)'
 input_regex_int = r'(.*): (.*)'
 
-class Monkey:
-    def __init__(self, data_tuple):
-        self.own_name, self.name1, self.op_sign, self.name2 = tuple(data_tuple)
+def part_1():
+    # finished_monkeys_dict = {}
+    # unfinished_monkeys_list = []
+    all_monkeys = {}
 
-
-
-        if self.op_sign == '+':
-            self.operation = lambda monkey_dict: monkey_dict[self.name1] + monkey_dict[self.name2]
-        elif self.op_sign == '-':
-            self.operation = lambda monkey_dict: monkey_dict[self.name1] - monkey_dict[self.name2]
-        elif self.op_sign == '*':
-            self.operation = lambda monkey_dict: monkey_dict[self.name1] * monkey_dict[self.name2]
-        elif self.op_sign == '/':
-            self.operation = lambda monkey_dict: monkey_dict[self.name1] // monkey_dict[self.name2]
+    class Monkey:
+        def __init__(self, name, value, other_monkey_1 = UNKNOWN, other_monkey_2 = UNKNOWN, op_sign = UNKNOWN):
+            self.name = name
+            self.value = value
+            self.other_monkey_1 = other_monkey_1
+            self.other_monkey_2 = other_monkey_2
+            self.op_sign = op_sign
         
-    def set_part_2_op(self):
-        self.operation = lambda monkey_dict: monkey_dict[self.name1] == monkey_dict[self.name2]
+        def update_monkeys(self):
+            if self.other_monkey_1 != UNKNOWN:
+                self.other_monkey_1 = all_monkeys[self.other_monkey_1]
+            if self.other_monkey_2 != UNKNOWN:
+                self.other_monkey_2 = all_monkeys[self.other_monkey_2]
 
+        def can_it_finish(self):
+            if self.name == HUMN:
+                return False
+            other1 = self.other_monkey_1
+            other2 = self.other_monkey_2
 
-def part_1(part):
-    finished_monkeys_dict = {}
-    unfinished_monkeys_list = []
-    # all_monkeys = 
+            if self.name == ROOT:
+                if other1.value != UNKNOWN and other2.value == UNKNOWN:
+                    other2.value = other1.value
+                if other2.value != UNKNOWN and other1.value == UNKNOWN:
+                    other1.value = other2.value
+                return other2.value != UNKNOWN and other1.value != UNKNOWN
+
+            if [self.value, other1.value, other2.value].count(UNKNOWN) == 0:
+                return True
+            elif [self.value, other1.value, other2.value].count(UNKNOWN) > 1:
+                return False
+
+            # Exactly one unknown means that the last value can be calculated
+            sign = self.op_sign
+            if self.value == UNKNOWN:
+                if sign == '+':   self.value = other1.value + other2.value
+                elif sign == '-': self.value = other1.value - other2.value
+                elif sign == '*': self.value = other1.value * other2.value
+                elif sign == '/': self.value = other1.value // other2.value
+            elif other1.value == UNKNOWN:
+                if sign == '+':   other1.value = self.value - other2.value
+                elif sign == '-': other1.value = self.value + other2.value
+                elif sign == '*': other1.value = self.value // other2.value
+                elif sign == '/': other1.value = self.value * other2.value
+            elif other2.value == UNKNOWN:
+                if sign == '+':   other2.value = self.value - other1.value
+                elif sign == '-': other2.value = other1.value - self.value
+                elif sign == '*': other2.value = self.value // other1.value
+                elif sign == '/': other2.value = other1.value // self.value
+            else:
+                assert(False)
+            return True
     
     for line in input_list:
         terms = re.findall(input_regex_full, line)
         if terms == []:
             # Finished monkey
             terms = re.findall(input_regex_int, line)
-            terms = list(terms[0])
-            finished_monkeys_dict[terms[0]] = int(terms[1])
+            own_name, value = terms[0]
+            monkey = Monkey(own_name, int(value))
+            if own_name == HUMN:
+                monkey.value = UNKNOWN
+            all_monkeys[monkey.name] = monkey
         else:
-            monkey = Monkey(terms[0])
-            if monkey.own_name == ROOT and part == 2:
-                monkey.set_part_2_op()
-            unfinished_monkeys_list.append(monkey)
+            own_name, name1, op_sign, name2 = terms[0]
+            if own_name == ROOT:
+                op_sign = '='
+            own_name, name1, op_sign, name2 = terms[0]
+            monkey = Monkey(own_name, UNKNOWN, name1, name2, op_sign)
+            all_monkeys[monkey.name] = monkey
+    
+    not_finished_monkeys_list = []
+    for monkey in all_monkeys.values():
+        monkey.update_monkeys()
+        if monkey.value == UNKNOWN:
+            not_finished_monkeys_list.append(monkey)
+    
+    while True:
+        # Break condition
+        if all_monkeys[HUMN].value != UNKNOWN:
+            return all_monkeys[HUMN].value
 
-    if part == 1:
-        while unfinished_monkeys_list:
-            for monkey in reversed(unfinished_monkeys_list):
-                if monkey.name1 in finished_monkeys_dict and monkey.name2 in finished_monkeys_dict:
-                    finished_monkeys_dict[monkey.own_name] = monkey.operation(finished_monkeys_dict)
-                    unfinished_monkeys_list.remove(monkey)
-        return finished_monkeys_dict[ROOT]
-    
-    
+        # Loop over all not finished monkeys
+        for monkey in reversed(not_finished_monkeys_list):
+            # If 2/3 relevant monkeys have value, update the third and consider it done
+            print(monkey.name)
+            if monkey.can_it_finish():
+                print('finished')
+                # Add it to finished
+                not_finished_monkeys_list.remove(monkey)
+                pass
 
-    
-    
-
-    
-
-    
-
-print(part_1(1)) # 353837700405464 / 152
+print(part_1()) # 353837700405464 / 152
 # print(part_1(2)) # 8302
