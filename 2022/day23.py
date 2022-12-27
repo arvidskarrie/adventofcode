@@ -6,7 +6,7 @@ import aocd
 import re
 from collections import deque
 
-USE_TEST_DATA = 1
+USE_TEST_DATA = 0
 TEST_DATA = '....#..\n..###.#\n#...#.#\n.#...##\n#.###..\n##.#.##\n.#..#..'
 REAL_DATA = '.##.#.#......###..######...##.##.#..#.#.#.#######.###.#####...#...#..#\n#...######.#.#.#.##....#..##.###.#..##.#..#.....##.....#....###.##.##.\n.##.#.##..#.....#...###..#...##.##...........#.#..###.###...####.##..#\n##.#.##.#.####......#####..#.....#..#....###..#..####.##.#.###....####\n.....#...#.######...###..#....##.#.####.###.#..###...#.#.#..###.##...#\n#.#...#.##.....#..#######..##.###.###.####.#.##..##........#.#####..#.\n.#..###..#.....#..##.....#..#.##....#....##..###..#####.#....##.#.#..#\n#..##.##.#.##.#..#.#.#.#..#.#.#..#.#...######.###.#..##.##...##.#.##.#\n.##....#....#..#..#.###.......##.#..###..#....#.####....##.#.##...###.\n.....#.###.#....##.....#...###...##.#.#.#.....###.#..#..##..#..##.#.##\n..#..####..#####.####..#...#####..###.#..###.#.#####.####..##...###...\n..#.#.#.##.##.#.##.###.....##...##...#....#...#...##...#.#..####.#.###\n.##.#..##..........##.#....###..##....##.#.##....##.##.##.#.#.###.##..\n..###....#.#.#.....#.##.#.....#####.#.#...##..#..##.#....##.....##....\n###..##.#.#.#...#.#..#.#.#.##.#.#.....#..##.##.....##.#.#.##..###..###\n#....#.#...#..##.###...###.#.#####...#.###...##.####..##.####.#..##..#\n##..#.#.#####.#..######..###.......#..##..#..#.#.###.###.#..#.#..###..\n..####.#.##.###.#...##.##.......#...#...##.#.##..#.#.#.#.#...#..#..###\n..#..##...#.#.#.#..#...###..#.....###.##.####.#..#.#..#.....##.##.#.##\n.#.##.####..#.#.#...#.#.##....###.#.##....###...###.#...#####.##.#.#..\n..##....###...#.#..######.##.#...#.##.##..#.#.##..#.######..#.#.#..##.\n..#.......#...##.#...##.##...#####...##..##.#.#.##...###...#.#..####.#\n#.##..#####.......#.#.#.####..##..##...####...#...###.....##..#.#....#\n..#...#####.#.#..##.#..#.#.#.####..##....######..##........##..#.#...#\n###....#..###..#.###.####...##..#..##..##.#..##.###....#.####.#....##.\n.#.##.###.#.#####.#.#.#.#...#.#.#....#####.###.#.##..#.....##.#..###..\n#.##..##.#.####....#..##.#.#####...#.##....####...##.##.#..##......#..\n.#..........####....#.#.###...#....#.#.##...#.#...#...#...##.#.......#\n..#.#...#..#..#...#.#..##..##.#.....#...##.##.##.###.##.#.###.##.#.#..\n..##..##..#.#..#..#...##.##......#.#..#.#..##..#.##.####...####..#.#.#\n###...#....#.##.....###...#..#.#.....#.#..###.#..#####..#.#.#..#.##...\n#.#..#.###..##.##.#.#######.#.#..#.....#.#...########..####.##.#.#####\n.#.###.....##..##...####.##.###.....###....#.#....##.#.###..###.##.#.#\n######.#....##..##.#.##.##.###.####.##.###..#..##...###.#....#.#.#....\n#..###...#####.....##..##.#.#....#.######.####....##..#..###...#.#.#..\n......#.###....#...##.##.###.#.#....##...#..#..#..####.#.#..#.###.#.#.\n.##........#...#########.##...##.#..##..#.#..#.##.####..##....###.####\n#.#.###.#....#.##.##.#...##..######..#.#..####..#.####.#...#..#.##..#.\n####..##...##..#.####.#.#.#.....##...###.#.#....##....##.###.##.....#.\n#.####..#....####.#.#.##.....##.#####.#.#.####.##...##..#####.....##..\n.##.##.....##..#.....##.###.##.###.#.#..##..####.###..##..##...##.#..#\n.....#...#.##.#.#.....#.#.#.#..######..#..#.##.#.#......#....#..#..###\n.#..#...##.#..#.###....#..##..###...##.##.#.#..##..##...#.#.##.###...#\n..#.#.#.####.#.####....#.#....#..###....#..#.##.#....##..#.#..###..##.\n.#..#.####..#.....##.######.#.##..##..#.##.##..##.#..##.#.####..#..##.\n####.#...##..########..#.#..#...#.#.#####.#..#.......##.###..###.###.#\n.###.###....#..#..###.....#.#.#.#...#.###.#.##.##.####.#.###..##..#..#\n...##.#.#.######..##..#.#.#..#.#.#....#.....#.#..##.#......##..#####.#\n#####.#.#.#.##..####.####.....##...#.#####...#.###..#...#...#######..#\n...####..##..##....####.........#.#.#.##.#..#.###...##..###..#...#...#\n.#..##...###.####.##.....#..#..#....#.#.#.#####.#...##....#####.####..\n###.#..##.#.#.##......#.##.####...#...#..##..#..####..###...##.#..####\n####.#...#.....##..#....#........###.#..#.#...#..##..#..#.#...####.#..\n#.#...###.##.##..#####.##....##.#....#.##....####...###.....##.#.#.###\n#.#..#.###.......#.###..#....###..#...##.###.###..###........#..#.##.#\n.##.#..##..#..##..###.#...#.#.#.#.#.#.##.###.#.##.#######.#.##...#...#\n#.####..###.#.....#........#...###..#..#.#.#.#..#.##....##.#...#...##.\n##..###..###...#..#.######....###.##...##..##.#....#.....##..##..##..#\n##.#....#.##.###..###.######.#..#.#..#.##..#.#....##.#.##..#......###.\n.##..##.#..#.#.##..##..#..#..###....#..#.#.###.#....##.#..###..#.#..##\n..#..########.###.#########.##.#####.....#....#####....#.#...#.#..#.##\n..####...#####.#..###.#.#.###.####.###...##..#..#..##.......###.###..#\n.#.####.#..##.#####.###.#########.#...#...###.###.#.##...##.#####..#.#\n##...#..#..#.##.####....#....##.#.###.#....#.#.....###..#.###.#..#.##.\n.#.##.....#...#...#......#..#.##..###....#.##..###......#..#.####..#.#\n#.##.##.#####.##........####.##.#.###...##..####.#....#.##..##.#####..\n#..#.###.##.####..#..#.##.#.#####..##...#######.#.##.####.#.#.....#.#.\n###........#...#...####...#.############.#...#...#..#.#.#..#.....##.#.\n...##...#...#.##...###..#..###.##....#.###.....####....##..#.#..#..##.\n###...###.####.###..#.#..###.####..#.##..#..#...##.###........#.##..#.'
 # TEST_DATA = '.....\n..##.\n..#..\n.....\n..##.\n.....'
@@ -25,120 +25,71 @@ EAST = ((1, 0), [(1, -1), (1, 0), (1, 1)])
 PRIO_LIST = [NORTH, SOUTH, WEST, EAST]
 NO_SUGGESTION = -2
 
-class Elf:
-    def __init__(self, x, y) -> None:
-        self.x = x
-        self.y = y
-        self.suggested_pos = NO_SUGGESTION
-    
-    def set_proposal(self, elf_list, prio_list):
-        elf_positions = [(elf.x, elf.y) for elf in elf_list]
+def set_proposal(coords, elf_dict, prio_list):
+    x, y = coords
+    for test_dir in prio_list:
+        if is_dir_okay(coords, elf_dict.keys(), test_dir):
+            elf_dict[coords] = (x + test_dir[0][0], y + test_dir[0][1])
+            return True
+    return False
 
-        for test_dir in prio_list:
-            if self.is_dir_okay(elf_positions, test_dir):
-                self.suggested_pos = (self.x + test_dir[0][0], self.y + test_dir[0][1])
-                return True
-        return False
+def has_any_neighbour(coords, elf_dict_keys):
+    # Get neighbour coords list:
+    x, y = coords
+    neigh_coords = [(x+1, y+0), (x+1, y+1), (x+0, y+1), (x-1, y+1), (x-1, y+0), (x-1, y-1), (x+0, y-1), (x+1, y-1)]
 
-    def has_any_neighbour(self, elf_list):
-        # Get neighbour coords list:
-        x = self.x
-        y = self.y
-        neigh_coords = [(x+1, y+0), (x+1, y+1), (x+0, y+1), (x-1, y+1), (x-1, y+0), (x-1, y-1), (x+0, y-1), (x+1, y-1)]
+    for other_elf in elf_dict_keys:
+        if other_elf in neigh_coords:
+            return True
+    return False
 
-        for other_elf in elf_list:
-            if (other_elf.x, other_elf.y) in neigh_coords:
-                return True
-        return False
+def is_dir_okay(coords, elf_dict, dir):
+    for test_positions in dir[1]:
+        x = coords[0] + test_positions[0]
+        y = coords[1] + test_positions[1]
+        if (x, y) in elf_dict:
+            return False
+    return True
 
-    def is_dir_okay(self, elf_list, dir):
-        for test_positions in dir[1]:
-            x = self.x + test_positions[0]
-            y = self.y + test_positions[1]
-            if (x, y) in elf_list:
-                return False
-        return True
-
-    def set_suggested_pos(self):
-        self.x = self.suggested_pos[0]
-        self.y = self.suggested_pos[1]
-        self.suggested_pos = NO_SUGGESTION
-
-def print_elfs(elf_list):
-    max_x, min_x, max_y, min_y = get_min_mix_x_y(elf_list)
-
-    elf_positions = [(elf.x, elf.y) for elf in elf_list]
-
-    for y in range(max_y, min_y-1, -1):
-        ack_string = ""
-        for x in range(min_x, max_x+1):
-            ack_string += '#' if (x, y) in elf_positions else '.'
-        print(ack_string)
-
-
-def get_min_mix_x_y(elf_list):
-    max_x = max_y = -1e10
-    min_x = min_y = 1e10
-
-    for elf in elf_list:
-        max_x = max(max_x, elf.x)
-        min_x = min(min_x, elf.x)
-        max_y = max(max_y, elf.y)
-        min_y = min(min_y, elf.y)
-    return (max_x, min_x, max_y, min_y)
-
+def set_suggested_pos(coords, sugg, elf_dict):
+    elf_dict[sugg] = NO_SUGGESTION
+    del elf_dict[coords]
 
 def part_1(part):
-    elf_list = []
+    elf_dict = {}
     for y_value, row in enumerate(input_list):
         for x_value, char in enumerate(row):
             if char == '#':
                 inverse_y_value = -y_value # Positiv y upwards
-                elf = Elf(x_value, inverse_y_value)
-                elf_list.append(elf)
+                elf_dict[(x_value, inverse_y_value)] = NO_SUGGESTION
 
-    for round in range(1000):
+    for round in range(10000):
+        print(round, len(elf_dict))
         # Set correct prio based on round
         prio_list = deque(PRIO_LIST)
         prio_list.rotate(-round) # check
         prio_list = list(prio_list)
 
-        # Print elf list
-        print(round, get_min_mix_x_y(elf_list), len(elf_list))
-        # print_elfs(elf_list)
-
-        # Insert all proposals in elf_list
-        for elf in elf_list:
+        # Insert all proposals in elf_dict
+        for coords, sugg in elf_dict.items():
             # stand still if no neighbours or no possible move
-            elf.suggested_pos = NO_SUGGESTION
-            if elf.has_any_neighbour(elf_list):
-                elf.set_proposal(elf_list, prio_list)
+            elf_dict[coords] = NO_SUGGESTION
+            if has_any_neighbour(coords, elf_dict.keys()):
+                set_proposal(coords, elf_dict, prio_list)
 
         someone_moved = False
-        for elf in elf_list:
-            if elf.suggested_pos == NO_SUGGESTION:
+        old_elf_dict = elf_dict.copy()
+        for coords, sugg in old_elf_dict.items():
+            if sugg == NO_SUGGESTION:
                 continue
             # If no other elf has the suggested position, make the move
-            make_move = True
-            for other_elf in elf_list:
-                if other_elf == elf:
-                    continue
-                if elf.suggested_pos == other_elf.suggested_pos:
-                    make_move = False
-                    break
-            if make_move:
-                elf.set_suggested_pos()
+            if sum(map(lambda x: x == sugg, elf_dict.values())) == 1:
+                set_suggested_pos(coords, sugg, elf_dict)
                 someone_moved = True
 
         if someone_moved:
             pass
-            # Make moves
         else:
             return round+1
-
-    # Calculate the area and substract the number of elves
-    max_x, min_x, max_y, min_y = get_min_mix_x_y(elf_list)
-
-    return (max_x - min_x + 1) * (max_y - min_y + 1) - len(elf_list)
 
 print(part_1(1)) # 29243 too high
