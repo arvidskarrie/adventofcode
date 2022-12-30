@@ -136,8 +136,9 @@ def part_1(part):
 
             # Check end condition
             if curr_end_space in available_spaces:
+
                 total_rounds += round + 1
-                print(round + 1)
+                if outer_round == 0: print('For part 1:', round + 1)
                 break
     return total_rounds
 print(part_1(1))
