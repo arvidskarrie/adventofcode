@@ -116,22 +116,28 @@ def get_neighbours(pos_tuple):
 
 def part_1(part):
     board = Board(input_list)
-    available_spaces = [(START_SPACE)]
 
-    for round in range(2000):
-        # Move winds
-        board.move_winds()
+    total_rounds = 0
+    for outer_round in range(3):
+        curr_end_space = END_SPACE if outer_round in [0, 2] else START_SPACE
+        available_spaces = [(START_SPACE)] if outer_round in [0, 2] else [(END_SPACE)]
 
-        # Calculate new available spaces
-        neighbours_to_test = []
-        for av_space in available_spaces:
-            neighbours_to_test += get_neighbours(av_space)
-        neighbours_to_test = list(dict.fromkeys(neighbours_to_test))
-        
-        available_spaces = board.check_availability(neighbours_to_test)
+        for round in range(2000):
+            # Move winds
+            board.move_winds()
 
-        # Check end condition
-        if END_SPACE in available_spaces:
-            return round + 1
+            # Calculate new available spaces
+            neighbours_to_test = []
+            for av_space in available_spaces:
+                neighbours_to_test += get_neighbours(av_space)
+            neighbours_to_test = list(dict.fromkeys(neighbours_to_test))
+            
+            available_spaces = board.check_availability(neighbours_to_test)
 
+            # Check end condition
+            if curr_end_space in available_spaces:
+                total_rounds += round + 1
+                print(round + 1)
+                break
+    return total_rounds
 print(part_1(1))
