@@ -15,41 +15,53 @@ if USE_TEST_DATA:
 else:
     input_list = aocd.get_data(day=25).splitlines()
 
-CONV_DICT = {
+CONV = {
     '2': 2,
     '1': 1,
     '0': 0,
     '-': -1,
     '=': -2
 }
+REV_CONV = {
+    2: '2',
+    1: '1',
+    0: '0',
+    -1: '-',
+    -2: '=',
+}
 
-def convert(elf_string):
-    elf_list = list(elf_string)
-    number = 0
-    while elf_list:
-        number *= 5
-        char = elf_list.pop(0)
-        number += CONV_DICT[char]
-    return number
+def get_val_rest(part_sum):
+    if part_sum > 2:
+        return REV_CONV[part_sum - 5], 1
+    if part_sum < -2:
+        return REV_CONV[part_sum + 5], -1
+    return REV_CONV[part_sum], 0
 
-def reverse_convert(dec_number):
-    start_power = int(math.log(dec_number, 5) + 1)
-    elf_number = ""
-    for power in range(start_power, -1, -1):
-        div = pow(5, power)
-        num = (dec_number + div // 2) // div
-        elf_number += next(key for key, value in CONV_DICT.items() if value == num)
-        dec_number -= num * div
-    if elf_number[0] == '0': elf_number = elf_number[1:]
-    return elf_number
+def add(num1, num2):
+    # num1 shall be bigger or equal to num2
+    if len(num2) > len(num1): num1, num2 = num2, num1
+    num1, num2 = list(num1), list(num2)
 
+    # Add zeroes to num2 if necessary
+    len_diff = len(num1) - len(num2)
+    num2 = ['0'] * len_diff + num2
+    
+    # Reverse both strings to process
+    power = 0
+    new_number = ""
+    carry = 0
+    for n1, n2 in zip(reversed(num1), reversed(num2)):
+        part_sum = CONV[n1] + CONV[n2] + carry
+        val, carry = get_val_rest(part_sum)
+        new_number = val + new_number
+    if carry == 1:
+        new_number = '1' + new_number
+    return new_number
 
 def part_1(part):
-    total_sum = 0
+    total_sum = "0"
     for line in input_list:
-        total_sum += convert(line)
-    
-    # Find this 
-    return reverse_convert(total_sum)
+        total_sum = add(total_sum, line)
+    return total_sum
 
 print(part_1(1))
