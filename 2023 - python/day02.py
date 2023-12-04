@@ -32,21 +32,18 @@ def part_1():
 
         blue_matches = re.findall(BLUE_REGEX, input)
         blue_cubes = map(int, blue_matches)
-        blue_cubes_overload = map(lambda x: x > MAX_BLUE, blue_cubes)
+        blue_max = max(blue_cubes)
+
 
         red_matches = re.findall(RED_REGEX, input)
         red_cubes = map(int, red_matches)
-        red_cubes_overload = map(lambda x: x > MAX_RED, red_cubes)
+        red_max = max(red_cubes)
 
         green_matches = re.findall(GREEN_REGEX, input)
         green_cubes = map(int, green_matches)
-        green_cubes_overload = map(lambda x: x > MAX_GREEN, green_cubes)
+        green_max = max(green_cubes)
 
-        if not (any(blue_cubes_overload) or any(red_cubes_overload) or any(green_cubes_overload)):
-            print(input)
-            working_games_sum += game_match
-        else:
-            pass
+        working_games_sum += blue_max * red_max * green_max
 
 
     print(working_games_sum)
