@@ -16,22 +16,26 @@ def part_1():
         input_list = aocd.get_data(day=4).splitlines()
 
     total_points = 0
+    lottery_stack = list(range(1, len(input_list) + 1))
 
-    for (line_idx, line) in enumerate(input_list):
-        print(line)
+    # Add one of each lottery ticket
+    lottery_stack = [1 for _i in range(len(input_list))]
+
+    for (card, multiplicity) in enumerate(lottery_stack):
+        line = input_list[card]
         matches = re.findall(NUMBER_REGEX, line)[0]
         # Card number is match 0
         
         winning_numbers = list(map(int, matches[1].split()))
         elf_numbers = list(map(int, matches[2].split()))
         
-        card_score = 0.5
+        card_score = 0
         for num in elf_numbers:
             if num in winning_numbers:
-                card_score *= 2
+                card_score += 1
 
-        if card_score > 0.5:
-            total_points += card_score
+        for new_card in range(card + 1, card + card_score + 1):
+            lottery_stack[new_card] += multiplicity
+    print(sum(lottery_stack))
 
-    print(total_points)
 part_1()
