@@ -7,7 +7,6 @@ import re
 
 USE_TEST_DATA = 0
 TEST_DATA = 'seeds: 79 14 55 13\n\nseed-to-soil map:\n50 98 2\n52 50 48\n\nsoil-to-fertilizer map:\n0 15 37\n37 52 2\n39 0 15\n\nfertilizer-to-water map:\n49 53 8\n0 11 42\n42 0 7\n57 7 4\n\nwater-to-light map:\n88 18 7\n18 25 70\n\nlight-to-temperature map:\n45 77 23\n81 45 19\n68 64 13\n\ntemperature-to-humidity map:\n0 69 1\n1 0 69\n\nhumidity-to-location map:\n60 56 37\n56 93 4'
-# NUMBER_REGEX = r'^Card +(\d+): (.*) \| (.*)$'
 NUMBER_REGEX = r'(\d+)'
 
 def part_1():
@@ -50,37 +49,22 @@ def part_1():
         for seed_range in seed_range_list:
             (seed_start, seed_stop) = seed_range
             for transformation in transformations:
-                # For every tranformation range, see if any part of the seed range is in transformation range.
-                # If so, transform that part and send the rest to the todo list = seed_range_list
                 (trans_start, trans_stop, modification_needed) = transformation
 
-                if not (trans_start <= seed_start < trans_stop or trans_start < seed_stop <= trans_stop):
+                # If the seed range is fully outside transformation range, continue
+                if trans_stop <= seed_start or seed_stop <= trans_start:
                     continue
-
-                # Some part of the seed range is in the transformation range
-                if trans_start <= seed_start and seed_stop <= trans_start:
-                    # Seed:    |         |
-                    # Trans: |               |
-                    # Make the full transformation, nothing outside
-                    # No change of seed_start or seed_stop needed
-                    pass
-                elif trans_start <= seed_start < trans_stop < seed_stop:
-                    # Seed:    |         |
-                    # Trans: |        |
-                    # Save whatever's outside the trans range for another conversion
-                    untransformed_seed_range = (trans_stop, seed_stop)
-                    seed_range_list.append(untransformed_seed_range)
-                    # Add everything that is available in the trans range
+                
+                # Adjust if the tranformation start or stop is inside the seed range
+                if seed_start < trans_start < seed_stop:
+                    # Cut the head of seed range and add it back to seed range list
+                    seed_range_list.append((seed_start, trans_start))
                     seed_stop = trans_stop
-                elif (not trans_start <= seed_start < trans_stop) and trans_start < seed_stop <= trans_stop:
-                    # Seed:    |         |
-                    # Trans:       |                   |
-                    # Save whatever's outside the trans range for another conversion
-                    untransformed_seed_range = (seed_start, trans_start)
-                    seed_range_list.append(untransformed_seed_range)
-                    # Add everything that is available in the trans range
-                    seed_start = trans_start
-
+                if seed_start < trans_stop < seed_stop:
+                    # Cut the tail of seed range and add it back to seed range list
+                    seed_range_list.append((trans_stop, seed_stop))
+                    seed_stop = trans_stop
+                    
                 new_seed_range_list.append((seed_start + modification_needed, seed_stop + modification_needed))
                 break # next seed range
 
