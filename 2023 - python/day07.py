@@ -31,24 +31,30 @@ card_score_dict = {
     'A': 14,
     'K': 13,
     'Q': 12,
-    'J': 11,
-    'T': 10,
-    '9': 9,
-    '8': 8,
-    '7': 7,
-    '6': 6,
-    '5': 5,
-    '4': 4,
-    '3': 3,
-    '2': 2,
+    'T': 11,
+    '9': 10,
+    '8': 9,
+    '7': 8,
+    '6': 7,
+    '5': 6,
+    '4': 5,
+    '3': 4,
+    '2': 3,
+    'J': 2,
 }
 
+ALL_BUT_J_LIST = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
+
 def get_hand_score(hand: str):
-    card_count = list(collections.Counter(list(hand)).values())
-    card_count.sort(reverse = True)
-    card_count = tuple(card_count)
-    assert(card_count in hand_score_dict)
-    return hand_score_dict[card_count]
+    best_score = 0
+    for joker_val in ALL_BUT_J_LIST:
+        new_hand = hand.replace('J', joker_val)
+        card_count = list(collections.Counter(list(new_hand)).values())
+        card_count.sort(reverse = True)
+        card_count = tuple(card_count)
+        assert(card_count in hand_score_dict)
+        best_score = max(best_score, hand_score_dict[card_count])
+    return best_score
 
 def get_hand_sort_value(hand: (str, str)) -> bool:
     # Let the hand score be an integer, and let every card add a power of (1/13) after that
@@ -59,8 +65,6 @@ def get_hand_sort_value(hand: (str, str)) -> bool:
         assert(c in card_score_dict)
         score += quote * card_score_dict[c]
     return score
-    
-
 
 def part_1():
     if USE_TEST_DATA:
@@ -77,7 +81,8 @@ def part_1():
     total_winnings = 0
     for (idx, hand) in enumerate(hands):
         total_winnings += (idx + 1) * int(hand[1])
-    print(total_winnings)
+        print(hand[0])
+    print(total_winnings) # 254833040 too low
 
 
 part_1()
