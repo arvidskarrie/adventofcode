@@ -61,7 +61,7 @@ def get_hand_sort_value(hand: (str, str)) -> bool:
     score = get_hand_score(hand[0])
     quote = 1
     for c in hand[0]:
-        quote /= 13
+        quote /= 14
         assert(c in card_score_dict)
         score += quote * card_score_dict[c]
     return score
