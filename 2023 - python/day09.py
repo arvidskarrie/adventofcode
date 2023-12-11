@@ -21,7 +21,7 @@ def get_next_number(series: list[int]) -> int:
         new_series.append(series[i+1] - series[i])
     
     new_diff_for_last = get_next_number(new_series)
-    return series[-1] + new_diff_for_last
+    return series[0] - new_diff_for_last
 
 
 def part_1():
