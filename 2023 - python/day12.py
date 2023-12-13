@@ -69,7 +69,7 @@ def part_1():
     if USE_TEST_DATA:
         input_list = TEST_DATA.splitlines()
     else:
-        input_list = aocd.get_data().splitlines()
+        input_list = aocd.get_data(day=12).splitlines()
 
     no_of_arr = sum([
         prepare_and_run(line)
