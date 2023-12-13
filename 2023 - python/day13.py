@@ -12,54 +12,43 @@ USE_TEST_DATA = 0
 TEST_DATA = '#...##..#\n#....#..#\n..##..###\n#####.##.\n#####.##.\n..##..###\n#....#..#\n\n#.##..##.\n..#.##.#.\n##......#\n##......#\n..#.##.#.\n..##..##.\n#.#.##.#.'
 
 def sort_into_parts(data: list[str]) -> list[list[str]]:
-    return [
-        part.split("\n")
-        for part in "\n".join(data).split("\n\n")
-    ]
+    return [part.split("\n") for part in "\n".join(data).split("\n\n")]
 
+def get_mirror_plane(part):
+    for mirror in range(1, len(part)):
+        top_half = part[mirror - 1::-1]
+        bottom_half = part[mirror:]
+
+        no_of_errors = sum(
+            sum(top_val != bottom_val
+                for top_val, bottom_val in zip(top_row, bottom_row))
+            for top_row, bottom_row in zip(top_half, bottom_half)
+        )
+
+        if no_of_errors == 1:
+            return mirror
+    return None # if no plane found
+
+def test_vert_and_horiz(part):
+    mirror_plane = get_mirror_plane(part)
+    if mirror_plane:
+        return 100 * mirror_plane
+
+    # rotate the part ccw and do the same thing again
+    part = ["".join(row) for row in zip(*part[::-1])]
+
+    mirror_plane = get_mirror_plane(part)
+    if mirror_plane:
+        return mirror_plane
+
+    assert False, "No pattern found"
+    
 def part_1():
     if USE_TEST_DATA:
         input_list = TEST_DATA.splitlines()
     else:
         input_list = aocd.get_data().splitlines()
 
-    parts = sort_into_parts(input_list)
-
-    pattern_sum = 0
-
-    for part in parts:
-        # Test horizontal symmetry
-        for mirror in range(1, len(part)):
-            number_of_tests = min(mirror, len(part) - mirror)
-            if all([
-                part[mirror - 1 - i] == part[mirror + i]
-                for i in range(number_of_tests)
-            ]):
-                pattern_sum += 100 * mirror
-                break
-        else:
-            # if break has not occured
-            # rotate the part ccw and do the same thing again
-            y_max = len(part)
-            x_max = len(part[0])
-            part = [[ \
-                part[x][y] for x in range(y_max)[::-1] \
-                ] for y in range(x_max) \
-            ]
-
-            # Test vertical symmetry
-            for mirror in range(1, len(part)):
-                number_of_tests = min(mirror, len(part) - mirror)
-                if all([
-                    part[mirror - 1 - i] == part[mirror + i]
-                    for i in range(number_of_tests)
-                ]):
-                    pattern_sum += mirror
-                    break
-            else:
-                # No mirror found
-                assert False
-    
-    print(pattern_sum) # 31746 too low
+    print(sum(test_vert_and_horiz(part) for part in sort_into_parts(input_list)) ) # 32069
 
 part_1()
