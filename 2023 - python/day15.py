@@ -31,8 +31,6 @@ def part_1():
 def get_box_number(line):
     current_value = 0
     for char in line:
-        if char in ["-", "="]:
-            break
         current_value = ((current_value + ord(char)) * 17) % 256
     return current_value
 
@@ -45,6 +43,9 @@ def part_2():
     input_list = input_list[0].split(",")
     lens_boxes = [[] for _ in range(256)]
     focal_lengths = {}
+
+    # part 1
+    print(sum(get_box_number(num) for num in input_list))
 
     for operation in input_list:
         data = re.findall(REGEX_STRING, operation)[0]
