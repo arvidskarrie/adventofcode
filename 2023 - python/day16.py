@@ -30,8 +30,6 @@ class Beam:
             return BEAM_DEAD
 
         match map[int(self.pos.imag)][int(self.pos.real)]:
-            case ".":
-                pass
             case "/":
                 # mirror along y = -x
                 self.dir = self.dir.imag + self.dir.real * 1j
@@ -41,19 +39,13 @@ class Beam:
                 self.dir = -(self.dir.imag + self.dir.real * 1j)
                 pass
             case "-":
-                if self.dir.real != 0:
-                    # pointy end, pass through
-                    pass
-                else:
+                if self.dir.real == 0:
                     # split into two new beams
                     # let this one turn to the right and a new one turn left
                     self.dir = 1 + 0j
                     return NEW_BEAM_LEFT
             case "|":
-                if self.dir.imag != 0:
-                    # pointy end, pass through
-                    pass
-                else:
+                if self.dir.imag == 0:
                     # split into two new beams
                     # let this one turn up and a new one turn down
                     self.dir = 0 + 1j
@@ -68,37 +60,16 @@ def part_2():
             input_list = [line.strip() for line in _file]
 
     input_list.reverse()
-
-    def print_map(map):
-        for i in map[::-1]:
-            print(i)
-
-
     best_result = 0
 
     # Generate all possible starting beams
-    height = len(input_list)
-    width = len(input_list[0])
-    left_side_beams = [
-        (-1 + k * 1j, 1 + 0j)
-        for k in range(0, height)
-    ]
-    right_side_beams = [
-        (width + k * 1j, -1 + 0j)
-        for k in range(0, height)
-    ]
-    upper_side_beams = [
-        (k + height * 1j, 0 - 1j)
-        for k in range(0, width)
-    ]
-    lower_side_beams = [
-        (k - 1j, 0 + 1j)
-        for k in range(0, width)
-    ]
-
-    start_beams = left_side_beams + right_side_beams + upper_side_beams + lower_side_beams
-    #start_pos = -1 + (len(input_list ) - 1)*1j
-    #start_dir = 1 + 0j
+    assert(len(input_list) == len(input_list[0])) # Assert square
+    side_length = len(input_list)
+    start_beams = [
+        (-1 + k * 1j, 1 + 0j) for k in range(0, side_length)] + [
+        (side_length + k * 1j, -1 + 0j) for k in range(0, side_length)] + [
+        (k + side_length * 1j, 0 - 1j) for k in range(0, side_length)] + [
+        (k - 1j, 0 + 1j) for k in range(0, side_length)]
 
     for (start_pos, start_dir) in start_beams:
         start_beam = Beam(start_pos, start_dir)

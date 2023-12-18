@@ -12,6 +12,11 @@ TEST_DATA = 'Sabqponm\nabcryxxl\naccszExk\nacctuvwj\nabdefghi'
 UNVISITED = False
 VISITED = True
 
+RIGHT = 0
+UP = 1
+LEFT = 2
+DOWN = 3
+
 if USE_TEST_DATA:
     input_list = TEST_DATA.splitlines()
 else:
@@ -78,13 +83,19 @@ class Dijkstra:
             col = c_node.col
             # print('new lowest', line, col, lowest_distance)
 
-            neighbour_list = [(line, col+1), (line, col-1), (line+1, col), (line-1, col)]
+            # neighbour_list = [(line, col+1), (line, col-1), (line+1, col), (line-1, col)]s
+            neighbour_list = [(line, col+1, RIGHT), (line, col-1, LEFT), (line+1, col, DOWN), (line-1, col, UP)]
 
             # Go through all its neighbours
-            for (n_line, n_col) in neighbour_list:
+            for (n_line, n_col, dir) in neighbour_list:
                 # If node doesn't exist, skip
                 if n_line < 0 or n_col < 0 or n_line >= self.no_lines or n_col >= self.no_columns:
                     continue
+
+                # if fourth step in same direction, skip
+                new_limitation = (0 for _ in range(4))
+                new_limitation[dir] = current_node.limitations[dir] + 1
+                                  
                 n_node = self.nodes[n_line][n_col]
 
                 # If they are already visited, skip
