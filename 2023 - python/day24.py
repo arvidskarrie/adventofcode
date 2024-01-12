@@ -22,14 +22,12 @@ def part_1():
     # Intersection of two lines
     for hail_a, hail_b in combinations(hails, 2):
         # TODO handle vx = 0
-        (pxa, pya, _, vxa, vya, _) = hail_a
-        assert vxa != 0
+        (pxa, pya, pza, vxa, vya, vza) = hail_a
         ka = vya / vxa
         t0a = -pxa / vxa
         ma = vya * t0a + pya
 
-        (pxb, pyb, _, vxb, vyb, _) = hail_b
-        assert vxb != 0
+        (pxb, pyb, pzb, vxb, vyb, vzb) = hail_b
         kb = vyb / vxb
         t0b = -pxb / vxb
         mb = vyb * t0b + pyb
