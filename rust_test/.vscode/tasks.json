@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Current File",
+            "type": "shell",
+            "command": "rustc",
+            "args": [
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}.exe" // Change '.exe' if on a non-Windows platform
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$rustc"
+        },
+        {
+            "label": "Build and Run Current File",
+            "dependsOn": ["Run Current File"],
+            "type": "shell",
+            "command": "${fileDirname}/${fileBasenameNoExtension}.exe", // Change '.exe' if on a non-Windows platform
+            "problemMatcher": []
+        }
+    ]
+}
